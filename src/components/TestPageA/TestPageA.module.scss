@@ -1,0 +1,28 @@
+.testPageA {
+  background: #fff;
+  position: relative;
+  top:0;
+  left:0;
+  width:100%;
+  min-height: 100%;
+  :global {
+    .logo {
+      float: left;
+      font-size: 24px;;
+      color:#fff;
+      margin:0px 24px 0px -18px;
+      font-weight: 200;
+    }
+    .site-layout-background{
+      background: #fff;
+
+    }
+    .dappSurfMain {
+      text-align: center;
+      .textCon {
+        font-size: 32px;
+        padding-top:24px;
+      }
+    }
+  }
+}
