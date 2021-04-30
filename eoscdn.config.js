@@ -9,7 +9,7 @@ const resourceGroups = [
         sources: [
           "npm://preact@10.5.4/dist/preact.umd.js",
           "eos://debugstorage/resources/184ba2fcc628c9ba29b6181887f59129b75d0c407e906ea57d8b86bc69a7201a?scope=debugstorage&dataKey=data&index_position=2&key_type=sha256&storageEncoding=base64&compression=deflate&network=jungle",
-          "https://unpkg.com/preact@10.5.4/dist/preact.umd.js",
+          //"https://unpkg.com/preact@10.5.4/dist/preact.umd.js",
         ],
         externals: {
           "preact": "preact",
@@ -20,7 +20,7 @@ const resourceGroups = [
         sources: [
           "npm://preact@10.5.4/hooks/dist/hooks.umd.js",
           "eos://debugstorage/resources/81292fdd0e629469bad1aa747ecd0059ed5ffadeb38edbf6c57618cb94caa33c?scope=debugstorage&dataKey=data&index_position=2&key_type=sha256&storageEncoding=base64&compression=deflate&network=jungle",
-          "https://unpkg.com/preact@10.5.4/hooks/dist/hooks.umd.js",
+          //"https://unpkg.com/preact@10.5.4/hooks/dist/hooks.umd.js",
         ],
         externals: {
           "preact/hooks": "preactHooks",
@@ -31,7 +31,7 @@ const resourceGroups = [
         sources: [
           "npm://preact@10.5.4/compat/dist/compat.umd.js",
           "eos://debugstorage/resources/3e139032e6cd82575935ed3f04c545fd5d31f776364878652cbae1dbd1f0261f?scope=debugstorage&dataKey=data&index_position=2&key_type=sha256&storageEncoding=base64&compression=deflate&network=jungle",
-          "https://unpkg.com/preact@10.5.4/compat/dist/compat.umd.js",
+          //"https://unpkg.com/preact@10.5.4/compat/dist/compat.umd.js",
         ],
         externals: {
           "preact/compat": "preactCompat",
@@ -62,8 +62,8 @@ const resourceGroups = [
         type: "script",
         sources: [
           "npm://preact-router@3.2.1/dist/preact-router.js",
-          "eos://debugstorage/resources/951ba253320682af1efe153bc07298b02f37ab2e38bcd87dabd2931be2f2b77c?scope=debugstorage&dataKey=data&index_position=2&key_type=sha256&storageEncoding=base64&network=jungle",
-          "https://unpkg.com/preact-router@3.2.1/dist/preact-router.js",
+          "eos://debugstorage/resources/613e6eed837b0ed7bb3e32f924c84bd5d2d1521c5b134f63b5c792d989ac2c56?scope=debugstorage&dataKey=data&index_position=2&key_type=sha256&storageEncoding=base64&compression=deflate&network=jungle",
+          //"https://unpkg.com/preact-router@3.2.1/dist/preact-router.js",
         ],
         externals: {
           "preact-router": "preactRouter",
