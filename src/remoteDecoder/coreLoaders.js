@@ -1,6 +1,8 @@
 import {decompressAndDecodeRowResultData} from './decoder';
 import {tryAllPromises} from './promise';
 import * as eosjsLight from 'eosjs-light';
+import sha256 from 'tiny-sha256';
+
 
 function eosSourceObjectToTableQuery(sourceObject){
   const tableQuery = {
@@ -42,6 +44,15 @@ async function getTableValueFromSourceObject(sourceObject) {
   const rowResult = result.rows[0];
   if(typeof rowResult !== 'object' || !rowResult || !rowResult.hasOwnProperty(sourceObject.dataKey)){
     throw new Error("Invalid row response for source "+sourceObject.fullSource+"!");
+  }
+  
+  const dataString = rowResult[sourceObject.dataKey];
+
+  if(sourceObject.keyType === "sha256"){
+    const dataStringSha256Hash = sha256(dataString);
+    if(typeof sourceObject.keyValue!=='string'||sourceObject.keyValue.toLowerCase()!==dataStringSha256Hash.toLowerCase()){
+      throw new Error("Invalid row response!");
+    }
   }
 
   return decompressAndDecodeRowResultData(
@@ -95,6 +106,8 @@ function loadScriptRemote(src) {
 }
 
 function addScriptFromText(scriptText) {
+
+  // 
   eval(scriptText);
 }
 function addCSSFromText(cssText){

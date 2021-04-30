@@ -139,7 +139,7 @@ async function processFullResource(resource, options){
       }
     }
     newResource.sha256Hex = newResource.sources[0].sha256Hex;
-    newResource.sha256Base64 = newResource.sources[0].sha256Hex;
+    newResource.sha256Base64 = newResource.sources[0].sha256Base64;
     newResource.sources = newResource.sources.map(s=>{
       const newSource = Object.assign({}, s);
       delete newSource.sha256Hex;

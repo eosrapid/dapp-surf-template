@@ -1,5 +1,13 @@
 import {inflate} from 'pako';
 
+function stringToUint8Array(str){
+  const len = str.length;
+  const uint8Array = new Uint8Array(len);
+  for(let i=0;i<len;i++){
+    uint8Array[i] = str.charCodeAt(i);
+  }
+  return uint8Array;
+}
 
 function decodeRowResultData(data, encoding) {
   if(encoding === "utf-8"){
@@ -24,9 +32,9 @@ function decompressAndDecodeRowResultData(data, storageEncoding, compression, ou
   let outputBuffer;
   if(compression === "deflate"){
     if(outputEncoding === "utf-8"){
-      return inflate(decodedDataBuffer, {to: 'string'});
+      return inflate(stringToUint8Array(decodedDataBuffer), {to: 'string'});
     }
-    outputBuffer = inflate(outputBuffer)
+    outputBuffer = inflate(stringToUint8Array(outputBuffer))
   }else if(compression === "none"){
     outputBuffer = decodedDataBuffer;
   }else{

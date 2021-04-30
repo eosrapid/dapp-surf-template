@@ -11020,6 +11020,11 @@ timsort@^0.3.0:
   resolved "https://registry.yarnpkg.com/timsort/-/timsort-0.3.0.tgz#405411a8e7e6339fe64db9a234de11dc31e02bd4"
   integrity sha1-QFQRqOfmM5/mTbmiNN4R3DHgK9Q=
 
+tiny-sha256@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/tiny-sha256/-/tiny-sha256-1.0.2.tgz#3b20a75f77097dcec1af513f5189c26ec2f54992"
+  integrity sha1-OyCnX3cJfc7Br1E/UYnCbsL1SZI=
+
 tmp@^0.0.33:
   version "0.0.33"
   resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.0.33.tgz#6d34335889768d21b2bcda0aa277ced3b1bfadf9"

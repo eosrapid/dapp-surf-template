@@ -8,6 +8,7 @@ const resourceGroups = [
         type: "script",
         sources: [
           "npm://preact@10.5.4/dist/preact.umd.js",
+          "eos://debugstorage/resources/184ba2fcc628c9ba29b6181887f59129b75d0c407e906ea57d8b86bc69a7201a?scope=debugstorage&dataKey=data&index_position=2&key_type=sha256&storageEncoding=base64&compression=deflate&network=jungle",
           "https://unpkg.com/preact@10.5.4/dist/preact.umd.js",
         ],
         externals: {
@@ -18,6 +19,7 @@ const resourceGroups = [
         type: "script",
         sources: [
           "npm://preact@10.5.4/hooks/dist/hooks.umd.js",
+          "eos://debugstorage/resources/81292fdd0e629469bad1aa747ecd0059ed5ffadeb38edbf6c57618cb94caa33c?scope=debugstorage&dataKey=data&index_position=2&key_type=sha256&storageEncoding=base64&compression=deflate&network=jungle",
           "https://unpkg.com/preact@10.5.4/hooks/dist/hooks.umd.js",
         ],
         externals: {
@@ -28,6 +30,7 @@ const resourceGroups = [
         type: "script",
         sources: [
           "npm://preact@10.5.4/compat/dist/compat.umd.js",
+          "eos://debugstorage/resources/3e139032e6cd82575935ed3f04c545fd5d31f776364878652cbae1dbd1f0261f?scope=debugstorage&dataKey=data&index_position=2&key_type=sha256&storageEncoding=base64&compression=deflate&network=jungle",
           "https://unpkg.com/preact@10.5.4/compat/dist/compat.umd.js",
         ],
         externals: {
@@ -95,7 +98,7 @@ const resourceGroups = [
         },
       },
     ],
-  },*/
+  },
   {
     name: "classnames",
     loadOrder: "any",
@@ -112,7 +115,7 @@ const resourceGroups = [
         },
       }
     ],
-  },
+  },*/
   {
     name: "antd",
     loadOrder: "any",
@@ -122,7 +125,8 @@ const resourceGroups = [
         type: "script",
         sources: [
           "npm://antd@4.15.1/dist/antd.min.js",
-          "https://cdnjs.cloudflare.com/ajax/libs/antd/4.15.1/antd.min.js",
+          "eos://debugstorage/resources/d8112c32b524abefee10b2b7bc17e56da416951b89538c87bef04420658daf52?scope=debugstorage&dataKey=data&index_position=2&key_type=sha256&storageEncoding=base64&compression=deflate&network=jungle",
+          //"https://cdnjs.cloudflare.com/ajax/libs/antd/4.15.1/antd.min.js",
         ],
         externals: {
           "antd": "antd",
@@ -133,7 +137,7 @@ const resourceGroups = [
         sources: [
           "npm://antd@4.15.1/dist/antd.min.css",
           "eos://debugstorage/resources/bc0eccbc727a88e2cf346ea0c9ee81dd4d39d4ce0555436ea0acea065c0406fe?scope=debugstorage&dataKey=data&index_position=2&key_type=sha256&storageEncoding=base64&compression=deflate&network=jungle",
-          "https://cdnjs.cloudflare.com/ajax/libs/antd/4.15.1/antd.min.css",
+          //"https://cdnjs.cloudflare.com/ajax/libs/antd/4.15.1/antd.min.css",
         ],
       },
     ],

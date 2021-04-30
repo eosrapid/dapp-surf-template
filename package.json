@@ -13,7 +13,8 @@
     "preact": "^10.5.4",
     "preact-router": "^3.2.1",
     "react-scripts": "3.4.3",
-    "redux-zero": "^5.1.7"
+    "redux-zero": "^5.1.7",
+    "tiny-sha256": "^1.0.2"
   },
   "scripts": {
     "start": "RAPID_CDN_MODE=dev-cdn react-app-rewired start",
