@@ -106,9 +106,7 @@ function loadScriptRemote(src) {
 }
 
 function addScriptFromText(scriptText) {
-
-  // 
-  eval(scriptText);
+  (new Function(scriptText))();
 }
 function addCSSFromText(cssText){
   const styleSheet = document.createElement("style")
