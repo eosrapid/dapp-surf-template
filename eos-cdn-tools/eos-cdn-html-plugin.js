@@ -15,8 +15,8 @@ class EOSCDNHTMLPlugin {
     this.options = options;
   }
   apply(compiler) {
-    console.log('compiler.options: ',compiler.options);
-    console.log(Object.keys(compiler.options));
+    // console.log('compiler.options: ',compiler.options);
+    // console.log(Object.keys(compiler.options));
 
 
     compiler.hooks.compilation.tap(PluginName, (compilation) => {

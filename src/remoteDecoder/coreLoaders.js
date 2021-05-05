@@ -145,7 +145,7 @@ function addCSSFromText(cssText){
 }
 async function loadEOSSource(resource, sourceObject) {
   const value = await getAssetDataFromChain(resource, sourceObject);
-  console.log("getAssetDataFromChain (script): ",value);
+  // console.log("getAssetDataFromChain (script): ",value);
 
 
   
@@ -185,7 +185,7 @@ async function loadResourceFromAssetCache(resource){
       if(resource.type==="css"){
         return addCSSFromText(value);
       }else if(resource.type==="script"){
-        console.log("loadResourceFromAssetCache (script): ",value);
+        // console.log("loadResourceFromAssetCache (script): ",value);
         return addScriptFromText(value);
       }else{
         throw new Error("Unsupported resource type for asset cache Loader: "+resource.type+"!");
