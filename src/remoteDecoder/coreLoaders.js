@@ -2,6 +2,7 @@ import {decompressAndDecodeRowResultData} from './decoder';
 import {tryAllPromises} from './promise';
 import * as eosjsLight from 'eosjs-light';
 import sha256 from 'tiny-sha256';
+import { getAPIManagerBySlugForce } from './network/currentNetwork';
 
 
 function eosSourceObjectToTableQuery(sourceObject){
@@ -34,10 +35,9 @@ function getEOSAPIURLForNetworkName(networkName){
   }
 }
 async function getTableValueFromSourceObject(sourceObject) {
-  const rpc = new eosjsLight.JsonRpc(getEOSAPIURLForNetworkName(sourceObject.network));
+  const apiManager = getAPIManagerBySlugForce(sourceObject.network);
   const tableQuery = eosSourceObjectToTableQuery(sourceObject);
-
-  const result = await rpc.get_table_rows(tableQuery);
+  const result = await apiManager.get_table_rows(tableQuery);
   if(!result||typeof result!=='object'||!Array.isArray(result.rows)||result.rows.length === 0){
     throw new Error("Invalid row response for source "+sourceObject.fullSource+"!");
   }
