@@ -40,7 +40,6 @@ class IndexedDBAssetCache {
       throw new Error("Database not opened!");
     }
     const lowercaseHash = hash.toLowerCase();
-    console.log("adding asset with hash "+lowercaseHash);
     const result = await addAssetToAssetCacheDB(this.db, lowercaseHash, data);
     return result;
   }
@@ -50,7 +49,6 @@ class IndexedDBAssetCache {
       throw new Error("Database not opened!");
     }
     const lowercaseHash = hash.toLowerCase();
-    console.log("getting asset with hash "+lowercaseHash);
     try {
       const result = await getAssetFromAssetCacheDB(this.db, lowercaseHash);
       if(!result || typeof result !=='object' || result.hash !== lowercaseHash || typeof result.data === 'undefined' || result.data === null){

@@ -64,8 +64,6 @@ async function getAssetDataFromChain(resource, sourceObject) {
     sourceObject.compression,
     sourceObject.outputEncoding
   );
-  window._sha256 = sha256;
-  console.log("sha256 result: ",sha256(decodedString));
   const decodedSha256Hash = sha256(decodedString).toLowerCase()
   if(decodedSha256Hash !== resource.sha256Hex.toLowerCase()){
     throw new Error("Invalid resource hash in decoded output of getAssetDataFromChain, expected "+resource.sha256Hex+", got "+decodedSha256Hash);
@@ -83,7 +81,7 @@ async function getAssetDataFromChain(resource, sourceObject) {
   }
 
 
-  return 
+  return decodedString;
 }
 function loadCSSRemote(src, integrity){
   return new Promise(function(resolve, reject) {
@@ -147,6 +145,9 @@ function addCSSFromText(cssText){
 }
 async function loadEOSSource(resource, sourceObject) {
   const value = await getAssetDataFromChain(resource, sourceObject);
+  console.log("getAssetDataFromChain (script): ",value);
+
+
   
   if(resource.type==="css"){
     addCSSFromText(value);
@@ -179,12 +180,12 @@ async function loadResourceFromAssetCache(resource){
   if(resource.type!=="inject" && typeof resource.sha256Hex === 'string' && canUseAssetCache){
     const assetCacheManager = getAssetCacheManager();
     await assetCacheManager.open();
-    console.log('resource.sha256Hex: ',resource.sha256Hex)
     const value = await assetCacheManager.getAssetData(resource.sha256Hex);
     if(typeof value === 'string'){
       if(resource.type==="css"){
         return addCSSFromText(value);
       }else if(resource.type==="script"){
+        console.log("loadResourceFromAssetCache (script): ",value);
         return addScriptFromText(value);
       }else{
         throw new Error("Unsupported resource type for asset cache Loader: "+resource.type+"!");
@@ -217,7 +218,6 @@ async function injectSource(resource) {
   
 }
 async function loadResource(resource, options){
-  console.log(resource);
   if(resource.type==="inject"){
     await injectSource(resource);
   }else{

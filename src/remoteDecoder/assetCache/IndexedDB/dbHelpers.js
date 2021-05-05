@@ -28,7 +28,7 @@ function openAssetCacheDB() {
         //store.createIndex('created_at', 'created_at', { unique: false });
         //store.createIndex('accessed_at', 'accessed_at', { unique: false });
       }else{
-        console.log("No changes needed for version "+e.oldVersion);
+        // console.log("No changes needed for version "+e.oldVersion);
       }
     }
   });
@@ -56,7 +56,6 @@ function addAssetToAssetCacheDBInternal(db, hash, data) {
   });
 }
 async function addAssetToAssetCacheDB(db, hash, data) {
-  console.log("addAssetToAssetCacheDB[1]: ",db,hash,data);
   const realHash = sha256(data).toLowerCase();
   if(realHash!==hash.toLowerCase()){
     throw new Error("Invalid asset hash, expected "+hash+", got "+realHash);
@@ -111,7 +110,6 @@ function getAssetFromAssetCacheDBInternal(db, hash) {
       reject(getRequest.error);
     };
     getRequest.onsuccess = function(event) {
-      console.log('getRequest.result: ',getRequest.result)
       resolve(getRequest.result);
     };
   });
