@@ -1,8 +1,9 @@
 import {decompressAndDecodeRowResultData} from './decoder';
 import {tryAllPromises} from './promise';
 import * as eosjsLight from 'eosjs-light';
-import sha256 from 'tiny-sha256';
+import sha256 from 'js-sha256';
 import { getAPIManagerBySlugForce } from './network/currentNetwork';
+import { supportsAssetCache, getAssetCacheManager } from './assetCache';
 
 
 function eosSourceObjectToTableQuery(sourceObject){
@@ -34,7 +35,7 @@ function getEOSAPIURLForNetworkName(networkName){
     throw new Error("Unsupported network "+networkName+"!");
   }
 }
-async function getTableValueFromSourceObject(sourceObject) {
+async function getRawAssetFromChain(resource, sourceObject){
   const apiManager = getAPIManagerBySlugForce(sourceObject.network);
   const tableQuery = eosSourceObjectToTableQuery(sourceObject);
   const result = await apiManager.get_table_rows(tableQuery);
@@ -47,29 +48,54 @@ async function getTableValueFromSourceObject(sourceObject) {
   }
   
   const dataString = rowResult[sourceObject.dataKey];
-
   if(sourceObject.keyType === "sha256"){
     const dataStringSha256Hash = sha256(dataString);
     if(typeof sourceObject.keyValue!=='string'||sourceObject.keyValue.toLowerCase()!==dataStringSha256Hash.toLowerCase()){
       throw new Error("Invalid row response!");
     }
   }
-
-  return decompressAndDecodeRowResultData(
-    rowResult[sourceObject.dataKey],
+  return dataString;
+}
+async function getAssetDataFromChain(resource, sourceObject) {
+  const dataString = await getRawAssetFromChain(resource, sourceObject);
+  const decodedString = decompressAndDecodeRowResultData(
+    dataString,
     sourceObject.storageEncoding,
     sourceObject.compression,
     sourceObject.outputEncoding
   );
+  window._sha256 = sha256;
+  console.log("sha256 result: ",sha256(decodedString));
+  const decodedSha256Hash = sha256(decodedString).toLowerCase()
+  if(decodedSha256Hash !== resource.sha256Hex.toLowerCase()){
+    throw new Error("Invalid resource hash in decoded output of getAssetDataFromChain, expected "+resource.sha256Hex+", got "+decodedSha256Hash);
+  }
+
+  const canUseAssetCache = supportsAssetCache();
+  if(canUseAssetCache && typeof decodedSha256Hash === 'string'){
+    const assetCacheManager = getAssetCacheManager();
+    try{
+      await assetCacheManager.open();
+      await assetCacheManager.addAsset(decodedSha256Hash, decodedString);
+    }catch(err){
+      console.error("Error adding asset to asset cache: ",err);
+    }
+  }
+
+
+  return 
 }
-function loadCSSRemote(src){
+function loadCSSRemote(src, integrity){
   return new Promise(function(resolve, reject) {
     const s = document.createElement('link');
     let r = false;
     s.type = 'text/css';
     s.rel = 'stylesheet';
-    s.href = src;
     s.async = true;
+    if(typeof integrity==='string'){
+      s.integrity = integrity;
+    }
+
     s.onerror = function(err) {
       reject(err, s);
     };
@@ -80,16 +106,21 @@ function loadCSSRemote(src){
         resolve();
       }
     };
+    s.href = src;
     document.head.appendChild(s);
   });
 }
-function loadScriptRemote(src) {
+function loadScriptRemote(src, integrity) {
   return new Promise(function(resolve, reject) {
     const s = document.createElement('script');
     let r = false;
     s.type = 'text/javascript';
-    s.src = src;
     s.async = true;
+    s.crossOrigin = "anonymous";
+    if(typeof integrity==='string'){
+      s.integrity = integrity;
+    }
+    
     s.onerror = function(err) {
       reject(err, s);
     };
@@ -100,6 +131,7 @@ function loadScriptRemote(src) {
         resolve();
       }
     };
+    s.src = src;
     const t = document.getElementsByTagName('script')[0];
     t.parentElement.insertBefore(s, t);
   });
@@ -114,7 +146,8 @@ function addCSSFromText(cssText){
   document.head.appendChild(styleSheet)
 }
 async function loadEOSSource(resource, sourceObject) {
-  const value = await getTableValueFromSourceObject(sourceObject);
+  const value = await getAssetDataFromChain(resource, sourceObject);
+  
   if(resource.type==="css"){
     addCSSFromText(value);
   }else if(resource.type==="script"){
@@ -125,9 +158,9 @@ async function loadEOSSource(resource, sourceObject) {
 }
 async function loadRemoteFile(resource, sourceObject){
   if(resource.type==="css"){
-    await loadCSSRemote(sourceObject.url);
+    await loadCSSRemote(sourceObject.url, "sha256-"+resource.sha256Base64);
   }else if(resource.type==="script"){
-    await loadScriptRemote(sourceObject.url);
+    await loadScriptRemote(sourceObject.url, "sha256-"+resource.sha256Base64);
   }else{
     throw new Error("Unsupported resource type for Remote Loader: "+resource.type+"!");
   }
@@ -140,6 +173,27 @@ async function loadLocalFile(resource, sourceObject){
   }else{
     throw new Error("Unsupported resource type for Local Loader: "+resource.type+"!");
   }
+}
+async function loadResourceFromAssetCache(resource){
+  const canUseAssetCache = supportsAssetCache();
+  if(resource.type!=="inject" && typeof resource.sha256Hex === 'string' && canUseAssetCache){
+    const assetCacheManager = getAssetCacheManager();
+    await assetCacheManager.open();
+    console.log('resource.sha256Hex: ',resource.sha256Hex)
+    const value = await assetCacheManager.getAssetData(resource.sha256Hex);
+    if(typeof value === 'string'){
+      if(resource.type==="css"){
+        return addCSSFromText(value);
+      }else if(resource.type==="script"){
+        return addScriptFromText(value);
+      }else{
+        throw new Error("Unsupported resource type for asset cache Loader: "+resource.type+"!");
+      }
+    }else{
+      throw new Error("Invalid response from asset cache for asset with hash "+resource.sha256Hex);
+    }
+  }
+  throw new Error("Asset cache not supported or not supported for this resource!");
 }
 async function loadResourceFromSource(resource, sourceObject) {
   if(sourceObject.type==="eos-file"){
@@ -167,6 +221,13 @@ async function loadResource(resource, options){
   if(resource.type==="inject"){
     await injectSource(resource);
   }else{
+    const canUseAssetCache = supportsAssetCache();
+    if(canUseAssetCache){
+      try {
+        await loadResourceFromAssetCache(resource);
+        return;
+      }catch(err){}
+    }
     await tryAllPromises(resource.sources.map((s)=>()=>loadResourceFromSource(resource, s)));
   }
 }

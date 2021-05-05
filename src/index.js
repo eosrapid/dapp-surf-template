@@ -3,8 +3,10 @@ import {loadAllResources} from './bootloader';
 
 import {getAPIManagerByChainId} from './remoteDecoder/network/currentNetwork';
 import {getNetworkConfigByChainId} from './remoteDecoder/network/config';
-import { getInjectedWebsiteConfig } from './utils/dappHelpers';
 
+function getInjectedWebsiteConfig(){
+  return window._DAPP_WEBSITE_CONFIG_JSON_;
+}
 
 async function setupAPI() {
   try {

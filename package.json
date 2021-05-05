@@ -9,16 +9,17 @@
     "antd": "^4.15.1",
     "classnames": "^2.3.1",
     "eosjs-light": "^0.0.4",
+    "js-sha256": "^0.9.0",
     "node-sass": "^4.14.1",
     "preact": "^10.5.4",
     "preact-router": "^3.2.1",
     "react-scripts": "3.4.3",
-    "redux-zero": "^5.1.7",
-    "tiny-sha256": "^1.0.2"
+    "redux-zero": "^5.1.7"
   },
   "scripts": {
     "start": "RAPID_CDN_MODE=dev-cdn react-app-rewired start",
     "start-local": "RAPID_CDN_MODE=dev-local react-app-rewired start",
+    "dev": "RAPID_CDN_MODE=dev-local react-app-rewired start",
     "build": "RAPID_CDN_MODE=build-cdn GENERATE_SOURCEMAP=false react-app-rewired build",
     "build-local": "RAPID_CDN_MODE=build-local GENERATE_SOURCEMAP=false react-app-rewired build",
     "generate-cdn-config": "node generateCDNFinalConfig.js",

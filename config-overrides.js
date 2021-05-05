@@ -4,7 +4,10 @@ const webpack = require('webpack');
 const InlineAssetsHtmlPlugin = require('./InlineAssetsHtmlPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const svgToMiniDataURI = require('mini-svg-data-uri');
-const configFinal = require('./src/.eoscdn.config.final.js')
+const configFinal = require('./src/.eoscdn.config.final.js');
+const defaultEntrypoint = path.resolve(__dirname, 'src', 'index.js');
+const devLocalEntrypoint = path.resolve(__dirname, 'src', 'devLocalEntrypoint.js');
+
 function getMode(envType){
   return process.env.RAPID_CDN_MODE
 }
@@ -34,9 +37,28 @@ function modifyRules(rulesList, testFunc, modifyFunc) {
   return modified;
 }
 function processRules(config, env) {
-  
   config.module = config.module || {};
   config.module.rules = config.module.rules || [];
+  const buildMode = getMode(env);
+  if(buildMode==="dev-local"){
+
+  }else if(buildMode==="dev-cdn"){
+    
+  }else{
+    config.module.rules[2].oneOf[0].options.limit = 1000*1000;
+    config.module.rules[2].oneOf.splice(1,0,{
+      test: /\.svg$/i,
+      use: [
+        {
+          loader: 'url-loader',
+          options: {
+            generator: (content) => svgToMiniDataURI(content.toString()),
+          },
+        },
+      ],
+    });
+  }
+
   /*
   modifyRules(
     config.module.rules,
@@ -60,49 +82,43 @@ function processRules(config, env) {
       ],
     }
   ].concat(config.module.rules);*/
-
- config.module.rules[2].oneOf[0].options.limit = 1000*1000;
- config.module.rules[2].oneOf.splice(1,0,{
-  test: /\.svg$/i,
-  use: [
-    {
-      loader: 'url-loader',
-      options: {
-        generator: (content) => svgToMiniDataURI(content.toString()),
-      },
-    },
-  ],
-});
 }
 
 function processPlugins(config, env) {
   //console.log(config.module.rules[2].oneOf[0])
   // disable cache
-  const newPlugins = [new webpack.HashedModuleIdsPlugin()].concat(config.plugins || []);
-  const inlineAssetsPluginInstance = new InlineAssetsHtmlPlugin({
-    test: {
-      test: (val) => {
-        if (val.indexOf("__eosnpmbundle__") !== -1) {
-          return false;
-        } else {
-          return /\.(css|js|json)$/.test(val);
-        }
-      },
-    }, // Required: regexp test of files to inline,
-    emit: false, // Optional: to emit the files that were inlined. Defaults to false (remove the files)
-  });
+  const buildMode = getMode(env);
+  if(buildMode==="dev-local"){
+    // none
+  }else if(buildMode==="dev-cdn"){
+    // none
+  }else{
+    const newPlugins = [new webpack.HashedModuleIdsPlugin()].concat(config.plugins || []);
+    const inlineAssetsPluginInstance = new InlineAssetsHtmlPlugin({
+      test: {
+        test: (val) => {
+          if (val.indexOf("__eosnpmbundle__") !== -1) {
+            return false;
+          } else {
+            return /\.(css|js|json)$/.test(val);
+          }
+        },
+      }, // Required: regexp test of files to inline,
+      emit: false, // Optional: to emit the files that were inlined. Defaults to false (remove the files)
+    });
 
-  for(let i=0;i<newPlugins.length;i++){
-    if(newPlugins[i] instanceof HtmlWebpackPlugin && newPlugins[i].options){
-      //console.log('hiz');
-      newPlugins[i].options.cache = false;
-      //console.log(newPlugins[i].options.minify);
-      //console.log(newPlugins);
-      newPlugins.splice(i+1,0, inlineAssetsPluginInstance);
-      break;
+    for(let i=0;i<newPlugins.length;i++){
+      if(newPlugins[i] instanceof HtmlWebpackPlugin && newPlugins[i].options){
+        //console.log('hiz');
+        newPlugins[i].options.cache = false;
+        //console.log(newPlugins[i].options.minify);
+        //console.log(newPlugins);
+        newPlugins.splice(i+1,0, inlineAssetsPluginInstance);
+        break;
+      }
     }
+    config.plugins = newPlugins;
   }
-  config.plugins = newPlugins;
 }
 function processExternals(config, env) {
   const buildMode = getMode(env);
@@ -134,29 +150,14 @@ function processExternals(config, env) {
   }
 }
 function processOptimization(config, env) {
-  config.optimization.minimize = true;
-  /*
-  config.optimization = {
-    runtimeChunk: 'single',
-    splitChunks: {
-      chunks: 'all',
-      maxInitialRequests: Infinity,
-      minSize: 0,
-      cacheGroups: {
-        vendor: {
-          test: /[\\/]fake_BAD_node_modules[\\/]/,
-          name(module) {
-            // get the name. E.g. node_modules/packageName/not/this/part.js
-            // or node_modules/packageName
-            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+  const buildMode = getMode(env);
+  if(buildMode==="dev-local"){
 
-            // npm package names are URL-safe, but some servers don't like @ symbols
-            return `npm.${packageName.replace(/@/g, '__at__')}.__eosnpmbundle__`;
-          },
-        },
-      },
-    },
-  };*/
+  }else if(buildMode==="dev-cdn"){
+
+  }else{
+    config.optimization.minimize = true;
+  }
 }
 function processAliases(config, env) {
   config.resolve.alias["react"] = "preact/compat";
@@ -164,7 +165,29 @@ function processAliases(config, env) {
   config.resolve.alias["react-dom"] = "preact/compat";
   config.resolve.alias['@'] = path.resolve(__dirname, 'src');
 }
+
+function processEntrypoint(config, env) {
+  const buildMode = getMode(env);
+
+  if(buildMode === "dev-local"){
+    if(Array.isArray(config.entry)){
+      config.entry = config.entry.map(ep=>{
+        if(ep === defaultEntrypoint){
+          return devLocalEntrypoint;
+        }else{
+          return ep;
+        }
+      });
+    }else if(config.entry === "string"){
+      if(config.entry === defaultEntrypoint){
+        config.entry = devLocalEntrypoint;
+      }
+    }
+  }
+
+}
 module.exports = function override(config, env) {
+  processEntrypoint(config, env);
   processExternals(config, env);
   config.output.jsonpFunction = 'eosweb';
   processPlugins(config, env);

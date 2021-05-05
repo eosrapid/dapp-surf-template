@@ -56,7 +56,7 @@ const TestPageA = ()=>{
     <Layout className={testPageA}>
       <Header className="header">
         <div className="logo">
-          Example
+          Examplezw
         </div>
         <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
           <Menu.Item key="1"><Link href="/">Home</Link></Menu.Item>
